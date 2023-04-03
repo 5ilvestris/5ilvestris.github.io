@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<title>Exploit Search</title>
+<script>
+function explodb()
+{
+var searchadress = 'https://www.google.com/search?q=inurl:"exploit-db.com" %26 intext:"';
+var syl = document.getElementById("word").value;
+if (syl=="") {window.location.href = "https://exploit-db.com";
+} else {
+var adress = searchadress+ syl+ '"';
+window.location.href = adress;
+}
+}
+function rapid7()
+{
+var searchadress = 'https://www.google.com/search?q=inurl:"rapid7.com" %26 intext:"';
+var syl = document.getElementById("word").value;
+if (syl=="") {window.location.href = "https://rapid7.com";
+} else {
+var adress = searchadress+ syl+ '"';
+window.location.href = adress;
+}
+}
+function secmatter()
+{
+var searchadress = 'https://www.google.com/search?q=inurl:"infosecmatter.com" %26 intext:"';
+var syl = document.getElementById("word").value;
+if (syl=="") {window.location.href = "https://infosecmatter.com";
+} else {
+var adress = searchadress+ syl+ '"';
+window.location.href = adress;
+}
+}
+function keydown(e) 
+{
+e = e || window.event;
+var tus = e.keyCode || e.which;
+if (tus == 13) 
+{
+return;
+}
+}
+</script>
+</head>
+<body>
+<center>
+<table BORDER width="32%">
+<tr>
+	<th COLSPAN="3">
+	  <input onkeydown="keydown(event)" type="text" name="username" placeholder="Search..." id="word" required autocomplete="on">
+	</th>
+</tr>
+<tr>
+	<td><input onClick="explodb()" type="button" id="button" value="Search on ExploitDB"/> </td>
+	<td><input onClick="rapid7()" type="button" id="button" value="Search on Rapid7"/></td>
+	<td><input onClick="secmatter()" type="button" id="button" value="Search on InfoSecMatter"/></td>
+</tr>
+</table>
+</center>
+</body>
+</html>
