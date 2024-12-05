@@ -21,7 +21,7 @@ body {
   flex-direction: row; /* Change to row layout */
   justify-content: 10px; /* Adjust as needed */
   width: 200%;
-  max-width: 1000px;
+  max-width: 600px;
   position: absolute;
 }
 .search-input {
