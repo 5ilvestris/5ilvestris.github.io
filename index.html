@@ -1,70 +1,40 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en" >
 <head>
-<title>Exploit Search</title>
-<script>
-function explodb()
-{
-var searchadress = 'https://www.google.com/search?q=inurl:"exploit-db.com" %26 intext:"';
-var syl = document.getElementById("word").value;
-if (syl=="") {window.location.href = "https://exploit-db.com";
-} else {
-var adress = searchadress+ syl+ '"';
-window.location.href = adress;
-}
-}
-function rapid7()
-{
-var searchadress = 'https://www.google.com/search?q=inurl:"rapid7.com" %26 intext:"';
-var syl = document.getElementById("word").value;
-if (syl=="") {window.location.href = "https://rapid7.com";
-} else {
-var adress = searchadress+ syl+ '"';
-window.location.href = adress;
-}
-}
-function secmatter()
-{
-var searchadress = 'https://www.google.com/search?q=inurl:"infosecmatter.com" %26 intext:"';
-var syl = document.getElementById("word").value;
-if (syl=="") {window.location.href = "https://infosecmatter.com";
-} else {
-var adress = searchadress+ syl+ '"';
-window.location.href = adress;
-}
-}
-function keydown(e) 
-{
-e = e || window.event;
-var tus = e.keyCode || e.which;
-if (tus == 13) 
-{
-return;
-}
-}
-function link()
-{
-href="animate.html"
-}
-</script>
+  <meta charset="UTF-8">
+  <title>Silvestris' Exploit Searcher</title>
+  <link rel="stylesheet" href="./style.css">
+
 </head>
 <body>
-<center>
-<table BORDER width="32%">
-<tr>
-	<th COLSPAN="3">
-	  <input onkeydown="keydown(event)" type="text" name="username" placeholder="Search..." id="word" required autocomplete="on">
-	</th>
-</tr>
-<tr>
-	<td><input onClick="explodb()" type="button" id="button" value="Search on ExploitDB"/> </td>
-	<td><input onClick="rapid7()" type="button" id="button" value="Search on Rapid7"/></td>
-	<td><input onClick="secmatter()" type="button" id="button" value="Search on InfoSecMatter"/></td>
-</tr>
-<tr>
-	<td><input onClick="link()" type="button" id="button" value="Other Link"/></td>
-</tr>
-</table>
-</center>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exploit Searcher</title>
+</head>
+<body>
+
+    <div class="search-container">
+        <input type="text" class="search-input"  id="word" placeholder="Search any exploits">
+
+
+    </div>
+ 
+     <div>
+		<button class="search-button" onClick="explodb()">Search on ExploitDB</button> 
+		<button class="search-button" onClick="rapid7()" >Search on Rapid7</button> 
+		<button class="search-button" onClick="secmatter()">Search on InfoSecMatter</button> 
+
+    </div>
+  <div class="developer">
+      By: <a href="https://github.com/5ilvestris">Silvestris</a></div>
+</body>
+</html>
+<!-- partial -->
+  <script  src="./script.js"></script>
+
 </body>
 </html>
