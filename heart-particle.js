@@ -40,7 +40,19 @@ function redraw() {
 
 };
 
+const gui = new dat.GUI();
+gui.add(settings, 'particleGap', 1, 20, 1).onChange(redraw);
+gui.add(settings, 'particleSize', .5, 20, .1).onChange(redraw);
+gui.add(settings, 'mouseForce', -300, 300, 5).onChange(redraw);
+gui.add(settings, 'noise', 0, 100, 1).onChange(redraw);
+gui.add(settings, 'layerCount', 1, 15, 1).onChange(redraw);
+gui.add(settings, 'layerDistance', 0.1, 20, .1).onChange(redraw);
+gui.add(settings, 'heartBeat');
+gui.add(settings, 'beatStrength', 0, 500, 1);
 
+if (isMobile) {
+  gui.close();
+}
 
 window.addEventListener('resize', redraw);
 
