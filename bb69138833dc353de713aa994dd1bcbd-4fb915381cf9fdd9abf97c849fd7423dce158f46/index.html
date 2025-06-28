@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacker</title>
+    <style>
+        /* Your existing styles from index.html */
+        @import url(https://fonts.googleapis.com/css?family=Gabriela|Dosis:200);
+
+        body {
+            font-family: "Vidaloka", serif;
+            font-smoothing: antialiased;
+            font-weight: normal;
+            background: #151618;
+            color: #FFF;
+            margin: 0;
+        }
+
+        /* ... more styles ... */
+
+        .container {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+
+        .controls {
+            font-smoothing: subpixel-antialiased;
+            position: absolute;
+            right: 20px;
+            top: 0;
+        }
+
+        .links {
+            position: absolute;
+            list-style: none;
+            width: 120px;
+            bottom: 40px;
+            right: 20px;
+            padding: 0;
+            margin: 0;
+        }
+
+        .links p {
+            font-smoothing: subpixel-antialiased;
+            font-family: 'Dosis', sans-serif;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 0.25em 0;
+            letter-spacing: 2px;
+            font-weight: 200;
+            font-size: 10px;
+            display: block;
+            width: 100%;
+            opacity: 0.6;
+            color: #FFF;
+        }
+
+        .links li {
+            border-bottom: #222 1px solid;
+            border-bottom: rgba(255,255,255,0.1) 1px solid;
+        }
+
+        .links li a {
+            transition: opacity 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+    <div id="container" class="container">
+        <div id="output" class="container">
+        </div>
+        <ul id="links" class="links">
+            <p>Press space to drop or pick up the light. Enter key to add another one</p>
+            <li><a class="who" href="https://twitter.com/msurguy" target="_blank">by msurguy</a></li>
+            <li><a class="blog" href="http://maxoffsky.com" target="_blank">Blog post</a></li>
+            <li><a class="source" href="https://github.com/msurguy/triangles" target="_blank">GitHub</a></li>
+        </ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
