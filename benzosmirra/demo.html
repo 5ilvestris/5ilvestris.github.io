@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>BenzosMirra</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Vars ─────────────────────────────────────────────────────────── */
+:root {
+  --bg:       #080a0f;
+  --surface:  #0e1118;
+  --surf2:    #141820;
+  --border:   #1e2535;
+  --accent:   #00d4ff;
+  --purple:   #7b5ea7;
+  --text:     #e8edf5;
+  --muted:    #5a6478;
+  --danger:   #ff4d6d;
+  --success:  #00e5a0;
+  --warn:     #ffb347;
+  --radius:   16px;
+  --header-h: 64px;
+  --nav-h:    72px;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  overflow: hidden;
+}
+
+/* ── Background ──────────────────────────────────────────────────────────── */
+.bg-grid {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(0,212,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.orb {
+  position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
+}
+.orb1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(0,212,255,.07) 0%, transparent 65%);
+  top: -150px; left: -150px;
+  animation: drift1 14s ease-in-out infinite;
+}
+.orb2 {
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, rgba(123,94,167,.09) 0%, transparent 65%);
+  bottom: 80px; right: -80px;
+  animation: drift2 18s ease-in-out infinite;
+}
+@keyframes drift1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(50px,70px)} }
+@keyframes drift2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-40px,-50px)} }
+
+/* ── Shell ───────────────────────────────────────────────────────────────── */
+#app {
+  position: relative; z-index: 1;
+  max-width: 430px; margin: 0 auto;
+  height: 100%; display: flex; flex-direction: column;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+header {
+  height: var(--header-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.logo { display:flex; align-items:center; gap:10px; }
+.logo-icon {
+  width:38px; height:38px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  border-radius:11px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:17px;
+  box-shadow: 0 0 24px rgba(0,212,255,.35);
+}
+.logo-name {
+  font-family:'Syne',sans-serif; font-weight:800; font-size:19px; letter-spacing:-.5px;
+}
+.logo-name em { font-style:normal; color:var(--accent); }
+.hdr-btns { display:flex; gap:8px; }
+.hdr-btn {
+  width:36px; height:36px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; color:var(--muted); transition:.2s;
+}
+.hdr-btn:hover { border-color:var(--accent); color:var(--accent); box-shadow:0 0 10px rgba(0,212,255,.2); }
+
+/* ── Pages ───────────────────────────────────────────────────────────────── */
+#pages {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  scroll-behavior: smooth;
+  padding-bottom: 8px;
+}
+#pages::-webkit-scrollbar { width:3px; }
+#pages::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+
+.page { display:none; padding:22px 20px; flex-direction:column; gap:18px; }
+.page.active { display:flex; }
+
+/* ── Bottom Nav ──────────────────────────────────────────────────────────── */
+nav {
+  height: var(--nav-h);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-around; align-items: center;
+  padding: 0 8px 12px;
+  flex-shrink: 0;
+}
+.nav-item {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  cursor:pointer; padding:6px 14px; border-radius:12px; transition:.2s;
+  user-select:none;
+}
+.nav-item.active { background:rgba(0,212,255,.08); }
+.nav-icon { font-size:18px; }
+.nav-label {
+  font-size:9px; letter-spacing:.8px; text-transform:uppercase;
+  color:var(--muted);
+}
+.nav-item.active .nav-label { color:var(--accent); }
+
+/* ── Upload Zone ─────────────────────────────────────────────────────────── */
+.upload-zone {
+  background:var(--surface); border:1.5px dashed var(--border);
+  border-radius:20px; padding:34px 20px;
+  display:flex; flex-direction:column; align-items:center; gap:12px;
+  cursor:pointer; transition:.3s; position:relative; overflow:hidden;
+}
+.upload-zone::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(0,212,255,.04),rgba(123,94,167,.04));
+  opacity:0; transition:.3s;
+}
+.upload-zone:hover::before { opacity:1; }
+.upload-zone:hover {
+  border-color:var(--accent);
+  box-shadow:0 0 28px rgba(0,212,255,.1),inset 0 0 28px rgba(0,212,255,.03);
+}
+.upload-zone.has-photo {
+  border-color:var(--accent); border-style:solid;
+  background:rgba(0,212,255,.04);
+}
+.upload-zone.dragging { border-color:var(--accent); background:rgba(0,212,255,.07); }
+
+.upload-icon-wrap {
+  width:64px; height:64px;
+  background:linear-gradient(135deg,rgba(0,212,255,.1),rgba(123,94,167,.1));
+  border-radius:18px; border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center; font-size:28px;
+  animation:float 3s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+.upload-title { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; }
+.upload-sub   { font-size:11px; color:var(--muted); text-align:center; line-height:1.7; }
+
+.photo-preview {
+  width:90px; height:90px; border-radius:18px; object-fit:cover;
+  border:2.5px solid var(--accent);
+  box-shadow:0 0 20px rgba(0,212,255,.3);
+}
+
+.pill-btn {
+  background:linear-gradient(135deg, var(--accent), var(--purple));
+  color:#000; border:none; padding:10px 26px; border-radius:50px;
+  font-family:'Syne',sans-serif; font-weight:700; font-size:13px;
+  cursor:pointer; letter-spacing:.4px; transition:.2s;
+  box-shadow:0 0 18px rgba(0,212,255,.3);
+}
+.pill-btn:hover { transform:translateY(-1px); box-shadow:0 0 28px rgba(0,212,255,.5); }
+
+/* ── Divider ──────────────────────────────────────────────────────────────── */
+.divider {
+  display:flex; align-items:center; gap:12px;
+  color:var(--muted); font-size:11px;
+}
+.divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* ── Camera Btn ──────────────────────────────────────────────────────────── */
+.camera-btn {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:15px;
+  display:flex; align-items:center; gap:14px; cursor:pointer; transition:.2s;
+}
+.camera-btn:hover { border-color:var(--purple); box-shadow:0 0 18px rgba(123,94,167,.15); }
+.cam-icon {
+  width:42px; height:42px; flex-shrink:0;
+  background:linear-gradient(135deg,rgba(123,94,167,.2),rgba(0,212,255,.1));
+  border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px;
+}
+.cam-info {}
+.cam-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; margin-bottom:2px; }
+.cam-sub   { font-size:11px; color:var(--muted); }
+.cam-arrow { margin-left:auto; color:var(--muted); font-size:16px; }
+
+/* ── Section title ────────────────────────────────────────────────────────── */
+.sec-title {
+  font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase;
+}
+
+/* ── Options Grid ─────────────────────────────────────────────────────────── */
+.opts-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.opt-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:14px; cursor:pointer; transition:.2s;
+  display:flex; flex-direction:column; gap:7px;
+}
+.opt-card:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,.3); }
+.opt-card.sel { border-color:var(--accent); background:rgba(0,212,255,.05); box-shadow:0 0 14px rgba(0,212,255,.15); }
+.opt-emoji { font-size:20px; }
+.opt-name  { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; }
+.opt-desc  { font-size:10px; color:var(--muted); line-height:1.5; }
+.opt-badge {
+  display:inline-block; font-size:9px; padding:2px 9px;
+  border-radius:50px; letter-spacing:.5px; font-weight:500; width:fit-content;
+}
+.b-fast   { background:rgba(0,229,160,.12); color:var(--success); }
+.b-deep   { background:rgba(0,212,255,.12); color:var(--accent); }
+.b-social { background:rgba(123,94,167,.18); color:#b09fd4; }
+.b-news   { background:rgba(255,77,109,.12); color:var(--danger); }
+
+/* ── Scan Button ─────────────────────────────────────────────────────────── */
+.scan-btn {
+  background:linear-gradient(135deg, var(--accent), var(--purple));
+  border:none; border-radius:16px; padding:17px; width:100%;
+  font-family:'Syne',sans-serif; font-size:15px; font-weight:800; color:#fff;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;
+  letter-spacing:.5px; transition:.3s;
+  box-shadow:0 4px 28px rgba(0,212,255,.25); position:relative; overflow:hidden;
+}
+.scan-btn::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);
+}
+.scan-btn:hover { transform:translateY(-2px); box-shadow:0 8px 36px rgba(0,212,255,.4); }
+.scan-btn:active { transform:translateY(0); }
+.scan-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+/* ── Toast ───────────────────────────────────────────────────────────────── */
+#toast {
+  position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--surf2); border:1px solid var(--border);
+  color:var(--text); font-size:12px; padding:10px 20px;
+  border-radius:50px; white-space:nowrap; opacity:0;
+  transition:.3s; pointer-events:none; z-index:200;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+#toast.err  { border-color:var(--danger); color:var(--danger); }
+#toast.ok   { border-color:var(--success); color:var(--success); }
+
+/* ── Loader Overlay ──────────────────────────────────────────────────────── */
+#scanOverlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(8,10,15,.96); z-index:150;
+  flex-direction:column; align-items:center; justify-content:center; gap:24px;
+}
+#scanOverlay.show { display:flex; }
+
+.radar { width:130px; height:130px; position:relative; }
+.r-ring {
+  position:absolute; border-radius:50%;
+  border:1px solid rgba(0,212,255,.25);
+}
+.r-ring:nth-child(1){inset:0}
+.r-ring:nth-child(2){inset:22px}
+.r-ring:nth-child(3){inset:44px}
+.r-sweep {
+  position:absolute; inset:0; border-radius:50%;
+  background:conic-gradient(from 0deg, transparent 260deg, rgba(0,212,255,.45) 360deg);
+  animation:spin 2s linear infinite;
+}
+.r-dot {
+  position:absolute; width:8px; height:8px; border-radius:50%;
+  background:var(--accent); top:50%; left:50%; transform:translate(-50%,-50%);
+  box-shadow:0 0 14px var(--accent);
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+
+.scan-label  { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; }
+.scan-steps  { display:flex; flex-direction:column; gap:8px; width:250px; }
+.s-step {
+  display:flex; align-items:center; gap:10px;
+  font-size:11px; color:var(--muted);
+  padding:9px 13px; border-radius:9px;
+  background:var(--surface); border:1px solid var(--border); transition:.5s;
+}
+.s-step.done   { color:var(--success); border-color:rgba(0,229,160,.3); }
+.s-step.active { color:var(--accent);  border-color:rgba(0,212,255,.3); animation:glow 1s ease-in-out infinite; }
+@keyframes glow { 0%,100%{box-shadow:none} 50%{box-shadow:0 0 14px rgba(0,212,255,.2)} }
+
+.cancel-btn {
+  background:transparent; border:1px solid var(--border);
+  color:var(--muted); padding:10px 30px; border-radius:50px;
+  font-family:'DM Mono',monospace; font-size:12px; cursor:pointer; transition:.2s;
+}
+.cancel-btn:hover { border-color:var(--danger); color:var(--danger); }
+
+/* ── Results ─────────────────────────────────────────────────────────────── */
+.result-header {
+  display:flex; justify-content:space-between; align-items:center;
+}
+.result-count {
+  font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--accent);
+}
+.result-sub { font-size:11px; color:var(--muted); }
+
+.result-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:14px; display:flex; gap:12px;
+  transition:.2s; cursor:pointer;
+}
+.result-card:hover { border-color:var(--border); background:var(--surf2); transform:translateX(3px); }
+
+.result-thumb {
+  width:50px; height:50px; border-radius:11px; flex-shrink:0;
+  background:linear-gradient(135deg,#1e2535,#2a3040);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; border:1px solid var(--border);
+  overflow:hidden;
+}
+.result-thumb img { width:100%; height:100%; object-fit:cover; }
+
+.result-info { flex:1; min-width:0; }
+.result-source {
+  font-size:10px; letter-spacing:.5px; color:var(--muted);
+  text-transform:uppercase; margin-bottom:3px;
+}
+.result-title {
+  font-family:'Syne',sans-serif; font-size:13px; font-weight:700;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:4px;
+}
+.result-url {
+  font-size:10px; color:var(--accent); opacity:.7;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+.conf-bar-wrap { display:flex; align-items:center; gap:6px; margin-top:6px; }
+.conf-bar-bg   { flex:1; height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+.conf-bar-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--accent),var(--purple)); }
+.conf-pct      { font-size:10px; color:var(--muted); width:28px; text-align:right; }
+
+.no-results {
+  text-align:center; padding:40px 20px;
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+}
+.no-results .emoji { font-size:40px; }
+.no-results .title { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; }
+.no-results .sub   { font-size:12px; color:var(--muted); line-height:1.7; }
+
+/* ── History ──────────────────────────────────────────────────────────────── */
+.hist-item {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:13px 15px;
+  display:flex; align-items:center; gap:12px; cursor:pointer; transition:.2s;
+}
+.hist-item:hover { background:var(--surf2); }
+.hist-avatar {
+  width:42px; height:42px; border-radius:12px;
+  background:linear-gradient(135deg,#1e2535,#2a3040);
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; flex-shrink:0; border:1px solid var(--border);
+}
+.hist-info { flex:1; min-width:0; }
+.hist-scope {
+  font-family:'Syne',sans-serif; font-size:13px; font-weight:700; margin-bottom:2px;
+}
+.hist-time  { font-size:10px; color:var(--muted); }
+.hist-badge { font-size:11px; font-weight:500; padding:3px 11px; border-radius:50px; }
+.h-found { background:rgba(0,229,160,.1); color:var(--success); }
+.h-none  { background:rgba(90,100,120,.18); color:var(--muted); }
+.h-err   { background:rgba(255,77,109,.1);  color:var(--danger); }
+
+/* ── Privacy Page ─────────────────────────────────────────────────────────── */
+.priv-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:18px; display:flex; flex-direction:column; gap:14px;
+}
+.priv-row {
+  display:flex; align-items:center; gap:14px;
+  padding-bottom:14px; border-bottom:1px solid var(--border);
+}
+.priv-row:last-child { border-bottom:none; padding-bottom:0; }
+.priv-icon { font-size:22px; flex-shrink:0; }
+.priv-label { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; margin-bottom:2px; }
+.priv-sub   { font-size:11px; color:var(--muted); line-height:1.5; }
+.toggle {
+  margin-left:auto; width:42px; height:24px; border-radius:50px; flex-shrink:0;
+  background:var(--border); position:relative; cursor:pointer; transition:.3s;
+}
+.toggle.on { background:var(--accent); }
+.toggle::after {
+  content:''; position:absolute; top:3px; left:3px;
+  width:18px; height:18px; border-radius:50%; background:#fff; transition:.3s;
+}
+.toggle.on::after { transform:translateX(18px); }
+
+/* ── Profile Page ─────────────────────────────────────────────────────────── */
+.profile-hero {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:20px; padding:24px; display:flex; flex-direction:column; align-items:center; gap:12px;
+}
+.profile-avatar {
+  width:72px; height:72px; border-radius:20px;
+  background:linear-gradient(135deg,var(--accent),var(--purple));
+  display:flex; align-items:center; justify-content:center; font-size:32px;
+  box-shadow:0 0 24px rgba(0,212,255,.3);
+}
+.profile-name  { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; }
+.profile-since { font-size:11px; color:var(--muted); }
+.stats-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; width:100%; }
+.stat-box {
+  background:var(--surf2); border:1px solid var(--border);
+  border-radius:12px; padding:12px; text-align:center;
+}
+.stat-num { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:var(--accent); }
+.stat-lbl { font-size:10px; color:var(--muted); letter-spacing:.5px; }
+
+.settings-list { display:flex; flex-direction:column; gap:8px; }
+.setting-row {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:14px 16px;
+  display:flex; align-items:center; gap:14px; cursor:pointer; transition:.2s;
+}
+.setting-row:hover { background:var(--surf2); }
+.setting-icon { font-size:18px; }
+.setting-label { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; }
+.setting-arrow { margin-left:auto; color:var(--muted); }
+
+/* ── API Key inputs ───────────────────────────────────────────────────────── */
+.key-input {
+  width:100%; background:var(--surf2); border:1px solid var(--border);
+  border-radius:10px; padding:11px 44px 11px 14px;
+  color:var(--text); font-family:'DM Mono',monospace; font-size:12px;
+  outline:none; transition:.2s;
+}
+.key-input:focus { border-color:var(--accent); box-shadow:0 0 10px rgba(0,212,255,.15); }
+.key-input::placeholder { color:var(--muted); }
+.eye-btn {
+  position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  background:none; border:none; cursor:pointer; font-size:14px; opacity:.5;
+  transition:.2s; padding:4px;
+}
+.eye-btn:hover { opacity:1; }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div id="toast"></div>
+
+<div id="scanOverlay">
+  <div class="radar">
+    <div class="r-ring"></div><div class="r-ring"></div><div class="r-ring"></div>
+    <div class="r-sweep"></div>
+    <div class="r-dot"></div>
+  </div>
+  <div class="scan-label" id="scanLabel">Tarama başlıyor...</div>
+  <div class="scan-steps">
+    <div class="s-step done"   id="ss1">✓  Yüz algılandı</div>
+    <div class="s-step active" id="ss2">◌  Özellikler çıkarılıyor</div>
+    <div class="s-step"        id="ss3">—  İnternet taranıyor</div>
+    <div class="s-step"        id="ss4">—  Sonuçlar eşleştiriliyor</div>
+  </div>
+  <button class="cancel-btn" onclick="cancelScan()">İptal Et</button>
+</div>
+
+<div id="app">
+
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🪞</div>
+      <div class="logo-name">Benzos<em>Mirra</em></div>
+    </div>
+    <div class="hdr-btns">
+      <div class="hdr-btn" title="API Durumu" onclick="checkApi()">⚡</div>
+      <div class="hdr-btn" title="Bilgi" onclick="showToast('BenzosMirra Demo Modu — by Benzo','ok')">ℹ</div>
+    </div>
+  </header>
+
+  <div id="pages">
+
+    <div class="page active" id="page-search">
+
+      <div class="upload-zone" id="uploadZone"
+           onclick="triggerUpload()"
+           ondragover="onDragOver(event)"
+           ondragleave="onDragLeave(event)"
+           ondrop="onDrop(event)">
+        <div class="upload-icon-wrap" id="uploadIconWrap">🖼️</div>
+        <div class="upload-title" id="uploadTitle">Fotoğraf sürükle veya seç</div>
+        <div class="upload-sub" id="uploadSub">JPG, PNG, WEBP desteklenir<br>Maksimum 10 MB</div>
+        <button class="pill-btn" id="uploadBtn"
+                onclick="event.stopPropagation(); triggerUpload()">Fotoğraf Seç</button>
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp"
+               style="display:none" onchange="handleFileSelect(this)">
+      </div>
+
+      <div class="divider">veya kamera kullan</div>
+
+      <div class="camera-btn" onclick="openCamera()">
+        <div class="cam-icon">📷</div>
+        <div class="cam-info">
+          <div class="cam-title">Fotoğraf Çek</div>
+          <div class="cam-sub">Cihaz kamerasını kullan</div>
+        </div>
+        <div class="cam-arrow">›</div>
+      </div>
+
+      <input type="file" id="cameraInput" accept="image/*" capture="user"
+             style="display:none" onchange="handleFileSelect(this)">
+
+      <div class="sec-title">Arama Kapsamı</div>
+      <div class="opts-grid">
+        <div class="opt-card sel" data-scope="quick" onclick="selectScope(this)">
+          <div class="opt-emoji">⚡</div>
+          <div class="opt-name">Hızlı Tarama</div>
+          <div class="opt-desc">Büyük platformlarda hızlı sonuç</div>
+          <div class="opt-badge b-fast">HIZLI</div>
+        </div>
+        <div class="opt-card" data-scope="deep" onclick="selectScope(this)">
+          <div class="opt-emoji">🌊</div>
+          <div class="opt-name">Derin Arama</div>
+          <div class="opt-desc">Tam internet taraması, daha doğru</div>
+          <div class="opt-badge b-deep">DERİN</div>
+        </div>
+        <div class="opt-card" data-scope="social" onclick="selectScope(this)">
+          <div class="opt-emoji">📱</div>
+          <div class="opt-name">Sosyal Medya</div>
+          <div class="opt-desc">Instagram, X, TikTok, LinkedIn</div>
+          <div class="opt-badge b-social">SOSYAL</div>
+        </div>
+        <div class="opt-card" data-scope="news" onclick="selectScope(this)">
+          <div class="opt-emoji">📰</div>
+          <div class="opt-name">Haber & Medya</div>
+          <div class="opt-desc">Haberler, basın, kamuya açık kayıtlar</div>
+          <div class="opt-badge b-news">MEDYA</div>
+        </div>
+      </div>
+
+      <button class="scan-btn" id="scanBtn" onclick="startScan()" disabled>
+        <span>🔍</span><span>TARAMAYI BAŞLAT</span>
+      </button>
+
+    </div><div class="page" id="page-results">
+      <div class="result-header">
+        <div>
+          <div class="result-count" id="resultCount">0</div>
+          <div class="result-sub" id="resultSub">sonuç bulunamadı</div>
+        </div>
+        <button class="pill-btn" onclick="goPage('search')" style="font-size:12px;padding:8px 18px;">
+          ← Yeni Arama
+        </button>
+      </div>
+      <div id="resultList"></div>
+    </div>
+
+    <div class="page" id="page-history">
+      <div class="sec-title">Son Aramalar</div>
+      <div id="histList">
+        <div class="no-results">
+          <div class="emoji">🕐</div>
+          <div class="title">Henüz arama yok</div>
+          <div class="sub">Bir fotoğraf yükle ve tarama başlat.<br>Geçmiş burada görünür.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-privacy">
+      <div class="sec-title">Gizlilik Ayarları</div>
+      <div class="priv-card">
+        <div class="priv-row">
+          <div class="priv-icon">🗑️</div>
+          <div>
+            <div class="priv-label">Fotoğrafları Otomatik Sil</div>
+            <div class="priv-sub">Tarama tamamlanınca yüklenen dosya sunucudan silinir</div>
+          </div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="priv-row">
+          <div class="priv-icon">📊</div>
+          <div>
+            <div class="priv-label">Arama Geçmişi</div>
+            <div class="priv-sub">Arama sonuçlarını bu cihazda sakla</div>
+          </div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="priv-row">
+          <div class="priv-icon">🔒</div>
+          <div>
+            <div class="priv-label">Şifreli Bağlantı</div>
+            <div class="priv-sub">Tüm veriler HTTPS üzerinden iletilir</div>
+          </div>
+          <div class="toggle on" style="pointer-events:none"></div>
+        </div>
+        <div class="priv-row">
+          <div class="priv-icon">🧹</div>
+          <div>
+            <div class="priv-label">Tüm Geçmişi Temizle</div>
+            <div class="priv-sub">Kayıtlı tüm tarama geçmişini sil</div>
+          </div>
+          <button class="pill-btn" style="font-size:11px;padding:7px 16px;margin-left:auto;background:linear-gradient(135deg,var(--danger),#c0392b);box-shadow:none"
+                  onclick="clearHistory()">Temizle</button>
+        </div>
+      </div>
+
+      <div class="sec-title">Hakkında</div>
+      <div class="priv-card">
+        <div class="priv-row">
+          <div class="priv-icon">🪞</div>
+          <div>
+            <div class="priv-label">BenzosMirra v1.0.0</div>
+            <div class="priv-sub">AI destekli yüz tanıma & internet arama<br>Geliştirici: Benzo</div>
+          </div>
+        </div>
+        <div class="priv-row">
+          <div class="priv-icon">⚖️</div>
+          <div>
+            <div class="priv-label">Etik Kullanım</div>
+            <div class="priv-sub">Bu uygulama yalnızca kişisel ve yasal amaçlarla kullanılabilir. Başkalarının rızası olmadan arama yapmak etik değildir.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-profile">
+      <div class="profile-hero">
+        <div class="profile-avatar">🧑‍💻</div>
+        <div class="profile-name">Benzo</div>
+        <div class="profile-since">BenzosMirra kullanıcısı · v1.0.0</div>
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-num" id="statTotal">0</div>
+            <div class="stat-lbl">TARAMA</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="statFound">0</div>
+            <div class="stat-lbl">BULUNDU</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="statRate">0%</div>
+            <div class="stat-lbl">BAŞARI</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-title">Ayarlar</div>
+      <div class="settings-list">
+        <div class="setting-row" onclick="goPage('apikeys')">
+          <div class="setting-icon">🔑</div>
+          <div class="setting-label">API Anahtarları</div>
+          <div class="setting-arrow">›</div>
+        </div>
+        <div class="setting-row" onclick="showToast('Model ayarları yakında eklenecek')">
+          <div class="setting-icon">🧠</div>
+          <div class="setting-label">Yüz Tanıma Modeli</div>
+          <div class="setting-arrow">›</div>
+        </div>
+        <div class="setting-row" onclick="showToast('Demo Modu: Localhost simüle ediliyor','ok')">
+          <div class="setting-icon">🌐</div>
+          <div class="setting-label">Backend URL</div>
+          <div class="setting-arrow">›</div>
+        </div>
+        <div class="setting-row" onclick="showToast('GitHub açılıyor...')">
+          <div class="setting-icon">🐙</div>
+          <div class="setting-label">GitHub Repo</div>
+          <div class="setting-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-apikeys">
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:-4px">
+        <button onclick="goPage('profile')" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1">←</button>
+        <div class="sec-title" style="margin:0">API Anahtarları</div>
+      </div>
+
+      <div id="keyStatusRow" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+
+      <div style="background:rgba(255,77,109,.06);border:1px solid rgba(255,77,109,.25);border-radius:14px;padding:14px;font-size:11px;color:var(--muted);line-height:1.8">
+        ⚠️ Tarama yapabilmek için <strong style="color:var(--text)">en az bir API anahtarı</strong> gereklidir.<br>
+        Anahtarlar <code style="color:var(--accent);font-size:10px">backend/.env</code> dosyasına kaydedilir ve yalnızca kendi cihazında çalışır.
+      </div>
+
+      <div class="priv-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🔍</span>
+          <div style="flex:1">
+            <div class="priv-label">SerpAPI <span style="font-size:10px;background:rgba(0,229,160,.12);color:var(--success);padding:2px 8px;border-radius:50px;margin-left:6px">ÖNERİLEN</span></div>
+            <div class="priv-sub">Google Ters Görsel Arama — Ayda 100 ücretsiz</div>
+          </div>
+          <a href="https://serpapi.com/users/sign_up" target="_blank"
+             style="font-size:10px;color:var(--accent);text-decoration:none;white-space:nowrap">Ücretsiz al →</a>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:8px">
+          serpapi.com → Dashboard → Your Private API Key
+        </div>
+        <div style="position:relative">
+          <input type="password" id="key_serpapi" placeholder="serpapi_key_xxxx..." class="key-input" autocomplete="off">
+          <button class="eye-btn" onclick="toggleVis('key_serpapi',this)">👁</button>
+        </div>
+      </div>
+
+      <div class="priv-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🔬</span>
+          <div style="flex:1">
+            <div class="priv-label">FaceCheck.ID <span style="font-size:10px;background:rgba(0,212,255,.12);color:var(--accent);padding:2px 8px;border-radius:50px;margin-left:6px">YÜZ TANIMA</span></div>
+            <div class="priv-sub">Sosyal medya odaklı yüz arama — Token bazlı</div>
+          </div>
+          <a href="https://facecheck.id/#api" target="_blank"
+             style="font-size:10px;color:var(--accent);text-decoration:none;white-space:nowrap">API al →</a>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:8px">
+          facecheck.id → Sign In → API Token
+        </div>
+        <div style="position:relative">
+          <input type="password" id="key_facecheck" placeholder="facecheck_token_xxxx..." class="key-input" autocomplete="off">
+          <button class="eye-btn" onclick="toggleVis('key_facecheck',this)">👁</button>
+        </div>
+      </div>
+
+      <div class="priv-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">👁️</span>
+          <div style="flex:1">
+            <div class="priv-label">TinEye <span style="font-size:10px;background:rgba(123,94,167,.18);color:#b09fd4;padding:2px 8px;border-radius:50px;margin-left:6px">TERS GÖRSEL</span></div>
+            <div class="priv-sub">Ters görsel arama motoru — Ayda 100 ücretsiz</div>
+          </div>
+          <a href="https://services.tineye.com/TinEyeAPI" target="_blank"
+             style="font-size:10px;color:var(--accent);text-decoration:none;white-space:nowrap">API al →</a>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:8px">
+          Format: <code style="color:var(--accent)">api_key:api_secret</code> (iki değeri iki nokta ile ayır)
+        </div>
+        <div style="position:relative">
+          <input type="password" id="key_tineye" placeholder="key:secret" class="key-input" autocomplete="off">
+          <button class="eye-btn" onclick="toggleVis('key_tineye',this)">👁</button>
+        </div>
+      </div>
+
+      <div class="priv-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🪟</span>
+          <div style="flex:1">
+            <div class="priv-label">Bing Visual Search</div>
+            <div class="priv-sub">Microsoft Azure — Ayda 1000 ücretsiz işlem</div>
+          </div>
+          <a href="https://portal.azure.com/#create/Microsoft.CognitiveServicesBingSearch" target="_blank"
+             style="font-size:10px;color:var(--accent);text-decoration:none;white-space:nowrap">Azure →</a>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:8px">
+          Azure Portal → Bing Search v7 → Keys and Endpoint → Key 1
+        </div>
+        <div style="position:relative">
+          <input type="password" id="key_bing" placeholder="bing_api_key_xxxx..." class="key-input" autocomplete="off">
+          <button class="eye-btn" onclick="toggleVis('key_bing',this)">👁</button>
+        </div>
+      </div>
+
+      <div class="priv-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">💎</span>
+          <div style="flex:1">
+            <div class="priv-label">PimEyes <span style="font-size:10px;background:rgba(255,179,71,.12);color:var(--warn);padding:2px 8px;border-radius:50px;margin-left:6px">ÜCRETLİ</span></div>
+            <div class="priv-sub">En kapsamlı yüz arama motoru — Enterprise</div>
+          </div>
+          <a href="https://pimeyes.com/en/api" target="_blank"
+             style="font-size:10px;color:var(--accent);text-decoration:none;white-space:nowrap">API al →</a>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:8px">
+          pimeyes.com → Account → API Access → Bearer Token
+        </div>
+        <div style="position:relative">
+          <input type="password" id="key_pimeyes" placeholder="pimeyes_token_xxxx..." class="key-input" autocomplete="off">
+          <button class="eye-btn" onclick="toggleVis('key_pimeyes',this)">👁</button>
+        </div>
+      </div>
+
+      <div class="priv-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🌐</span>
+          <div style="flex:1">
+            <div class="priv-label">Google Vision API <span style="font-size:10px;background:rgba(0,229,160,.12);color:var(--success);padding:2px 8px;border-radius:50px;margin-left:6px">1000/AY ÜCRETSİZ</span></div>
+            <div class="priv-sub">Web Detection — görsel üzerinden internet taraması</div>
+          </div>
+          <a href="https://console.cloud.google.com/apis/library/vision.googleapis.com" target="_blank"
+             style="font-size:10px;color:var(--accent);text-decoration:none;white-space:nowrap">GCP →</a>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:8px">
+          Google Cloud Console → Vision API → Credentials → API Key
+        </div>
+        <div style="position:relative">
+          <input type="password" id="key_google_vision" placeholder="AIzaSy..." class="key-input" autocomplete="off">
+          <button class="eye-btn" onclick="toggleVis('key_google_vision',this)">👁</button>
+        </div>
+      </div>
+
+      <div class="priv-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🖼️</span>
+          <div style="flex:1">
+            <div class="priv-label">ImgBB <span style="font-size:10px;background:rgba(0,229,160,.12);color:var(--success);padding:2px 8px;border-radius:50px;margin-left:6px">ÜCRETSİZ</span></div>
+            <div class="priv-sub">Görsel hosting — URL gerektiren API'ler için gerekli</div>
+          </div>
+          <a href="https://imgbb.com/signup" target="_blank"
+             style="font-size:10px;color:var(--accent);text-decoration:none;white-space:nowrap">Ücretsiz al →</a>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:8px">
+          imgbb.com → Account → API → Add API key
+        </div>
+        <div style="position:relative">
+          <input type="password" id="key_imgbb" placeholder="imgbb_api_key..." class="key-input" autocomplete="off">
+          <button class="eye-btn" onclick="toggleVis('key_imgbb',this)">👁</button>
+        </div>
+      </div>
+
+      <div class="priv-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">📸</span>
+          <div style="flex:1">
+            <div class="priv-label">Imgur Client ID <span style="font-size:10px;background:rgba(0,229,160,.12);color:var(--success);padding:2px 8px;border-radius:50px;margin-left:6px">ÜCRETSİZ</span></div>
+            <div class="priv-sub">Görsel hosting alternatifi — ImgBB yoksa kullanılır</div>
+          </div>
+          <a href="https://api.imgur.com/oauth2/addclient" target="_blank"
+             style="font-size:10px;color:var(--accent);text-decoration:none;white-space:nowrap">API al →</a>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:8px">
+          imgur.com → Register Application → Client ID
+        </div>
+        <div style="position:relative">
+          <input type="password" id="key_imgur" placeholder="imgur_client_id..." class="key-input" autocomplete="off">
+          <button class="eye-btn" onclick="toggleVis('key_imgur',this)">👁</button>
+        </div>
+      </div>
+
+      <button class="scan-btn" id="saveKeysBtn" onclick="saveKeys()">
+        <span>💾</span><span>ANAHTARLARI KAYDET</span>
+      </button>
+      <button onclick="deleteKeys()"
+              style="background:none;border:1px solid var(--border);color:var(--muted);
+                     padding:12px;border-radius:12px;font-family:'DM Mono',monospace;
+                     font-size:12px;cursor:pointer;transition:.2s"
+              onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'"
+              onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+        🗑️ Tüm Anahtarları Sil
+      </button>
+
+    </div></div><nav>
+    <div class="nav-item active" onclick="goPage('search')" id="nav-search">
+      <div class="nav-icon">🔍</div>
+      <div class="nav-label">Ara</div>
+    </div>
+    <div class="nav-item" onclick="goPage('results')" id="nav-results">
+      <div class="nav-icon">📋</div>
+      <div class="nav-label">Sonuçlar</div>
+    </div>
+    <div class="nav-item" onclick="goPage('history')" id="nav-history">
+      <div class="nav-icon">🕐</div>
+      <div class="nav-label">Geçmiş</div>
+    </div>
+    <div class="nav-item" onclick="goPage('privacy')" id="nav-privacy">
+      <div class="nav-icon">🛡️</div>
+      <div class="nav-label">Gizlilik</div>
+    </div>
+    <div class="nav-item" onclick="goPage('profile')" id="nav-profile">
+      <div class="nav-icon">👤</div>
+      <div class="nav-label">Profil</div>
+    </div>
+  </nav>
+
+</div><script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let state = {
+  fileId:      null,
+  scope:       'quick',
+  currentJob:  null,
+  pollTimer:   null,
+  history:     JSON.parse(localStorage.getItem('bm_history') || '[]'),
+  results:     [],
+  scanProgress: 0
+};
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function goPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  document.getElementById('pages').scrollTop = 0;
+  if (name === 'history') renderHistory();
+  if (name === 'profile') updateStats();
+  if (name === 'apikeys') loadKeyStatus();
+}
+
+// ── Upload ────────────────────────────────────────────────────────────────────
+function triggerUpload() {
+  document.getElementById('fileInput').click();
+}
+function openCamera() {
+  document.getElementById('cameraInput').click();
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.add('dragging');
+}
+function onDragLeave(e) {
+  document.getElementById('uploadZone').classList.remove('dragging');
+}
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('dragging');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+}
+
+function handleFileSelect(input) {
+  const file = input.files[0];
+  if (file) processFile(file);
+}
+
+function processFile(file) {
+  const allowed = ['image/jpeg','image/png','image/webp'];
+  if (!allowed.includes(file.type)) {
+    showToast('Desteklenmeyen dosya tipi. JPG, PNG veya WEBP seçin.','err');
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('Dosya 10 MB\'dan büyük olamaz.','err');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const zone = document.getElementById('uploadZone');
+    zone.classList.add('has-photo');
+    zone.innerHTML = `
+      <img src="${e.target.result}" class="photo-preview" alt="Seçilen fotoğraf">
+      <div class="upload-title" style="color:var(--accent)">✓ Fotoğraf Hazır</div>
+      <div class="upload-sub">Kapsam seç ve taramayı başlat</div>
+      <button class="pill-btn" onclick="event.stopPropagation(); resetUpload()">Değiştir</button>
+    `;
+  };
+  reader.readAsDataURL(file);
+
+  // Demo modu: Backend'e bağlanmak yerine sahte gecikme oluştur
+  uploadToBackend(file);
+}
+
+async function uploadToBackend(file) {
+  const btn = document.getElementById('scanBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span><span>YÜKLENİYOR...</span>';
+
+  // Demo mod: Simüle edilmiş sunucu yanıtı
+  setTimeout(() => {
+    state.fileId = "demo_file_" + Date.now();
+    showToast(`1 yüz algılandı (%98 güven)`, 'ok');
+    btn.disabled = false;
+    btn.innerHTML = '<span>🔍</span><span>TARAMAYI BAŞLAT</span>';
+  }, 1200);
+}
+
+function resetUpload() {
+  state.fileId = null;
+  const zone = document.getElementById('uploadZone');
+  zone.className = 'upload-zone';
+  zone.innerHTML = `
+    <div class="upload-icon-wrap" id="uploadIconWrap">🖼️</div>
+    <div class="upload-title" id="uploadTitle">Fotoğraf sürükle veya seç</div>
+    <div class="upload-sub" id="uploadSub">JPG, PNG, WEBP desteklenir<br>Maksimum 10 MB</div>
+    <button class="pill-btn" id="uploadBtn"
+            onclick="event.stopPropagation(); triggerUpload()">Fotoğraf Seç</button>
+    <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp"
+           style="display:none" onchange="handleFileSelect(this)">
+  `;
+  const btn = document.getElementById('scanBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span>🔍</span><span>TARAMAYI BAŞLAT</span>';
+}
+
+// ── Scope ─────────────────────────────────────────────────────────────────────
+function selectScope(card) {
+  document.querySelectorAll('.opt-card').forEach(c => c.classList.remove('sel'));
+  card.classList.add('sel');
+  state.scope = card.dataset.scope;
+}
+
+// ── Scan ──────────────────────────────────────────────────────────────────────
+async function startScan() {
+  if (!state.fileId) { showToast('Önce bir fotoğraf yükleyin.','err'); return; }
+
+  showOverlay();
+  state.currentJob = "demo_job_" + Date.now();
+  state.scanProgress = 0;
+  pollScan();
+}
+
+function pollScan() {
+  // Demo mod: Polling yapmak yerine progress bar'ı manuel arttır.
+  state.pollTimer = setInterval(() => {
+    state.scanProgress += Math.floor(Math.random() * 20) + 10;
+    
+    if (state.scanProgress >= 100) {
+      state.scanProgress = 100;
+    }
+    
+    updateStepUI(state.scanProgress);
+
+    if (state.scanProgress === 100) {
+      clearInterval(state.pollTimer);
+      setTimeout(() => {
+        finishScan([
+          { source: 'Instagram', title: '@demo_kullanici_tr', url: 'https://instagram.com/demo', confidence: 0.98 },
+          { source: 'LinkedIn', title: 'Demo Kişi - Software Developer', url: 'https://linkedin.com/in/demo', confidence: 0.88 },
+          { source: 'X (Twitter)', title: 'Demo Kişi (@demokisi)', url: 'https://twitter.com/demo', confidence: 0.74 }
+        ]);
+      }, 500);
+    }
+  }, 1000);
+}
+
+function updateStepUI(progress) {
+  const steps = ['ss2','ss3','ss4'];
+  const thresholds = [30, 60, 90];
+  steps.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (progress >= thresholds[i]) {
+      el.className = 's-step done';
+      el.textContent = '✓  ' + el.textContent.replace(/^[◌—✓]\s*/,'');
+    } else if (progress >= (thresholds[i-1] || 0)) {
+      el.className = 's-step active';
+      el.textContent = '◌  ' + el.textContent.replace(/^[◌—✓]\s*/,'');
+    }
+  });
+}
+
+function finishScan(results) {
+  hideOverlay();
+  state.results = results;
+
+  // Geçmişe ekle
+  const entry = {
+    id:       Date.now(),
+    scope:    state.scope,
+    count:    results.length,
+    time:     new Date().toLocaleString('tr-TR'),
+    found:    results.length > 0,
+  };
+  state.history.unshift(entry);
+  state.history = state.history.slice(0,30);
+  localStorage.setItem('bm_history', JSON.stringify(state.history));
+
+  renderResults(results);
+  goPage('results');
+}
+
+function cancelScan() {
+  clearInterval(state.pollTimer);
+  state.currentJob = null;
+  hideOverlay();
+  resetOverlaySteps();
+  showToast('Tarama iptal edildi', '');
+}
+
+// ── Overlay helpers ───────────────────────────────────────────────────────────
+function showOverlay() {
+  resetOverlaySteps();
+  document.getElementById('scanOverlay').classList.add('show');
+}
+function hideOverlay() {
+  document.getElementById('scanOverlay').classList.remove('show');
+}
+function resetOverlaySteps() {
+  const defs = [
+    {id:'ss1', cls:'done',   txt:'✓  Yüz algılandı'},
+    {id:'ss2', cls:'active', txt:'◌  Özellikler çıkarılıyor'},
+    {id:'ss3', cls:'',       txt:'—  İnternet taranıyor'},
+    {id:'ss4', cls:'',       txt:'—  Sonuçlar eşleştiriliyor'},
+  ];
+  defs.forEach(d => {
+    const el = document.getElementById(d.id);
+    el.className = 's-step ' + d.cls;
+    el.textContent = d.txt;
+  });
+}
+
+// ── Render Results ────────────────────────────────────────────────────────────
+const SOURCE_EMOJI = {
+  'Instagram':'📸','X (Twitter)':'🐦','LinkedIn':'💼','TikTok':'🎵',
+  'Facebook':'📘','Google Images':'🔍','Bing Images':'🔍','PimEyes':'👁️',
+  'FaceCheck.ID':'🔬','Google News':'📰','Reuters':'📡','BBC':'📺',
+  'Default':'🌐',
+};
+
+function renderResults(results) {
+  const list  = document.getElementById('resultList');
+  const count = document.getElementById('resultCount');
+  const sub   = document.getElementById('resultSub');
+
+  count.textContent = results.length;
+  sub.textContent   = results.length > 0
+    ? `eşleşme bulundu — ${scopeLabel(state.scope)} taraması`
+    : 'sonuç bulunamadı';
+
+  if (results.length === 0) {
+    list.innerHTML = `
+      <div class="no-results">
+        <div class="emoji">🔍</div>
+        <div class="title">Eşleşme bulunamadı</div>
+        <div class="sub">Bu fotoğraf için internet üzerinde<br>kayıtlı bir eşleşme bulunamadı.<br>Farklı kapsam ile tekrar dene.</div>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = results.map(r => {
+    const pct   = Math.round(r.confidence * 100);
+    const emoji = SOURCE_EMOJI[r.source] || SOURCE_EMOJI['Default'];
+    return `
+      <div class="result-card" onclick="openResult('${r.url}')">
+        <div class="result-thumb">${emoji}</div>
+        <div class="result-info">
+          <div class="result-source">${r.source}</div>
+          <div class="result-title">${r.title || 'Başlık yok'}</div>
+          <div class="result-url">${r.url}</div>
+          <div class="conf-bar-wrap">
+            <div class="conf-bar-bg">
+              <div class="conf-bar-fill" style="width:${pct}%"></div>
+            </div>
+            <div class="conf-pct">${pct}%</div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function openResult(url) {
+  showToast('URL açılıyor: ' + url.slice(0,40) + '...');
+}
+
+// ── History ───────────────────────────────────────────────────────────────────
+function renderHistory() {
+  const list = document.getElementById('histList');
+  if (state.history.length === 0) {
+    list.innerHTML = `
+      <div class="no-results">
+        <div class="emoji">🕐</div>
+        <div class="title">Henüz arama yok</div>
+        <div class="sub">Bir fotoğraf yükle ve tarama başlat.</div>
+      </div>`;
+    return;
+  }
+  list.innerHTML = state.history.map(h => `
+    <div class="hist-item">
+      <div class="hist-avatar">${h.found ? '✅' : '❌'}</div>
+      <div class="hist-info">
+        <div class="hist-scope">${scopeLabel(h.scope)} Taraması</div>
+        <div class="hist-time">${h.time}</div>
+      </div>
+      <div class="hist-badge ${h.found ? 'h-found' : 'h-none'}">
+        ${h.found ? h.count + ' bulundu' : 'Eşleşme yok'}
+      </div>
+    </div>
+  `).join('');
+}
+
+function clearHistory() {
+  state.history = [];
+  localStorage.removeItem('bm_history');
+  renderHistory();
+  showToast('Geçmiş temizlendi','ok');
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+function updateStats() {
+  const total  = state.history.length;
+  const found  = state.history.filter(h => h.found).length;
+  const rate   = total > 0 ? Math.round(found/total*100) : 0;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statFound').textContent = found;
+  document.getElementById('statRate').textContent  = rate + '%';
+}
+
+// ── API Keys (Mocked for Demo) ─────────────────────────────────────────────────
+async function loadKeyStatus() {
+  // Demo mod: Sadece belirli keyler var gibi göster
+  renderKeyStatus({
+    serpapi_set: true, facecheck_set: false, tineye_set: false,
+    bing_set: false, pimeyes_set: false, google_vision_set: true,
+    imgbb_set: false, imgur_set: false
+  });
+}
+
+function renderKeyStatus(d) {
+  const row = document.getElementById('keyStatusRow');
+  if (!row) return;
+  const items = [
+    { label: 'SerpAPI',      set: d.serpapi_set,       c: ['rgba(0,229,160,.1)','var(--success)','rgba(0,229,160,.3)']   },
+    { label: 'FaceCheck',    set: d.facecheck_set,      c: ['rgba(0,212,255,.1)','var(--accent)','rgba(0,212,255,.3)']   },
+    { label: 'TinEye',       set: d.tineye_set,         c: ['rgba(123,94,167,.15)','#b09fd4','rgba(123,94,167,.35)']     },
+    { label: 'Bing',         set: d.bing_set,           c: ['rgba(0,212,255,.1)','var(--accent)','rgba(0,212,255,.3)']   },
+    { label: 'PimEyes',      set: d.pimeyes_set,        c: ['rgba(255,179,71,.1)','var(--warn)','rgba(255,179,71,.3)']   },
+    { label: 'G.Vision',     set: d.google_vision_set,  c: ['rgba(0,229,160,.1)','var(--success)','rgba(0,229,160,.3)'] },
+    { label: 'ImgBB',        set: d.imgbb_set,          c: ['rgba(0,229,160,.1)','var(--success)','rgba(0,229,160,.3)'] },
+    { label: 'Imgur',        set: d.imgur_set,          c: ['rgba(0,229,160,.1)','var(--success)','rgba(0,229,160,.3)'] },
+  ];
+  row.innerHTML = items.map(i => {
+    const [bg,fg,bd] = i.set ? i.c : ['rgba(90,100,120,.15)','var(--muted)','var(--border)'];
+    return `<div style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+      border-radius:50px;font-size:10px;letter-spacing:.3px;
+      background:${bg};color:${fg};border:1px solid ${bd}">
+      ${i.set ? '✓' : '—'} ${i.label}</div>`;
+  }).join('');
+}
+
+async function saveKeys() {
+  const btn = document.getElementById('saveKeysBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span><span>KAYDEDİLİYOR...</span>';
+
+  // Demo mod: API key kaydetmeyi simüle et
+  setTimeout(() => {
+    showToast('✓ Demo modunda anahtarlar kaydedildi', 'ok');
+    ['key_serpapi','key_facecheck','key_tineye','key_bing','key_pimeyes','key_google_vision','key_imgbb','key_imgur'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    
+    // Rastgele durum yarat
+    renderKeyStatus({
+      serpapi_set: true, facecheck_set: true, tineye_set: false,
+      bing_set: false, pimeyes_set: false, google_vision_set: true,
+      imgbb_set: true, imgur_set: false
+    });
+    
+    btn.disabled = false;
+    btn.innerHTML = '<span>💾</span><span>ANAHTARLARI KAYDET</span>';
+  }, 800);
+}
+
+async function deleteKeys() {
+  if (!confirm('Tüm API anahtarlarını silmek istediğinden emin misin?')) return;
+  // Demo mod: Temizleme simülasyonu
+  showToast('✓ Demo modunda anahtarlar silindi', 'ok');
+  renderKeyStatus({
+    serpapi_set: false, facecheck_set: false, tineye_set: false,
+    bing_set: false, pimeyes_set: false, google_vision_set: false,
+    imgbb_set: false, imgur_set: false
+  });
+}
+
+function toggleVis(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.style.opacity = inp.type === 'text' ? '1' : '0.5';
+}
+
+window.addEventListener('load', loadKeyStatus);
+
+async function checkApi() {
+  // Demo mod: Direkt başarılı dönüş
+  showToast('Demo modu: API simüle ediliyor ✓', 'ok');
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = '', 3000);
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function scopeLabel(s) {
+  return {quick:'Hızlı',deep:'Derin',social:'Sosyal Medya',news:'Haber'}[s] || s;
+}
+
+</script>
+</body>
+</html>
